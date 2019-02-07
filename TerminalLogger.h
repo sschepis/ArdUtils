@@ -1,7 +1,7 @@
 #ifndef TERMINAL__LOGGER_H
 #define TERMINAL__LOGGER_H
 
-#include <ESP.h>
+#include <Arduino.h>
 
 class TerminalLogger {
 
