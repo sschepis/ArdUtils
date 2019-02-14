@@ -1,1 +1,7 @@
-void led_blink(byte LEDpin, byte onMS = 40, byte offMS = 40, byte loops = 1);
+#ifndef LED__UTILS_H
+#define LED__UTILS_H
+
+
+void led_blink(int LEDpin, int onMS = 40, int offMS = 40, int loops = 1);
+
+#endif //LED__UTILS_H

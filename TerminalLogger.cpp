@@ -1,73 +1,105 @@
 #include "TerminalLogger.h"
 
-#include <U8g2lib.h>
-#include <Wire.h>
+#include "Vector.h"
+#include <stdint.h>
 
-#define U8LOG_WIDTH 32
-#define U8LOG_HEIGHT 10
-uint8_t u8log_buffer[U8LOG_WIDTH*U8LOG_HEIGHT];
+#define BUFFER_WIDTH 32
+#define BUFFER_HEIGHT 8
 
-U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
-U8G2LOG u8g2log;
+Vector<uint8_t*> terminalLog_buffer;
 
-TerminalLogger* TerminalLogger::getInstance() {
-  if(!instance) instance = new TerminalLogger;
+char buf[BUFFER_WIDTH + 1];
+
+TerminalLogger* TerminalLogger::getInstance(SSD1306Wire *d) {
+  if(!instance) instance = new TerminalLogger(d);
   return instance;
 }
 
 TerminalLogger* TerminalLogger::instance = nullptr;
 
-TerminalLogger::TerminalLogger() {
-  u8g2.begin();
-  u8g2.setFont(u8g2_font_tom_thumb_4x6_mf);  // set the font for the terminal window
-  u8g2log.begin(u8g2, U8LOG_WIDTH, U8LOG_HEIGHT, u8log_buffer);
-  u8g2log.setLineHeightOffset(0); // set extra space between lines in pixel, this can be negative
-  u8g2log.setRedrawMode(0);   // 0: Update screen with newline, 1: Update screen for every char    
+TerminalLogger::TerminalLogger(SSD1306Wire *d) {
+  ssd1306display = d;
+  debugMode = false;
 }
 
 TerminalLogger::~TerminalLogger() {
 }
 
-void TerminalLogger::log(String output, bool newline) {
-  if(newline) {
-    u8g2log.println(output);
-    Serial.println(output);
-  }
-  else {
-    u8g2log.print(output);
-    Serial.print(output);
+void TerminalLogger::clear() {
+  if(ssd1306display != NULL) {
+    ssd1306display->clear();
+    ssd1306display->display();    
   }
 }
 
-void TerminalLogger::log(int output, bool newline) {
-  if(newline) {
-    u8g2log.println(output);
-    Serial.println(output);
+void TerminalLogger::addLine(const char *line) {
+  if(terminalLog_buffer.size() >= BUFFER_HEIGHT) {
+    uint8_t *tailLine = terminalLog_buffer.front();
+    terminalLog_buffer.remove(0);
+    free(tailLine);
   }
-  else {
-    u8g2log.print(output);
-    Serial.print(output);
+  terminalLog_buffer.push_back((uint8_t *)line);
+}
+
+void TerminalLogger::draw() {
+  if(ssd1306display != NULL) {
+    if(terminalLog_buffer.size() >= BUFFER_HEIGHT) {
+      ssd1306display->clear();
+      for(size_t idx = 0; idx < terminalLog_buffer.size(); idx++) {
+        ssd1306display->drawString(0, idx * 8, (const char*)terminalLog_buffer[idx]);
+      }
+    } else ssd1306display->drawString(0, (terminalLog_buffer.size()-1) * 8, (const char*)terminalLog_buffer.back());
+    ssd1306display->display();    
+  }
+}
+
+void TerminalLogger::log(String output, bool newline) {
+  snprintf(buf, BUFFER_WIDTH, "%s%s", output.c_str(), newline ? "\n" : "");  
+  Serial.print(buf);
+  if(ssd1306display != NULL) {
+    char *newLine = (char *) malloc((sizeof(char) * strlen(buf)) + 1);
+    strcpy(newLine, buf);
+    addLine(newLine);
+    draw();
+  }
+}
+
+void TerminalLogger::debug(String output, bool newline) {
+    if(debugMode)  log(output, newline);
+    else {
+        snprintf(buf, BUFFER_WIDTH, "%s%s", output.c_str(), newline ? "\n" : "");
+        Serial.print(buf);
+    }
+}
+
+void TerminalLogger::log(int output, bool newline) {
+  snprintf(buf, BUFFER_WIDTH, "%d%s", output, newline ? "\n" : "");  
+  Serial.print(buf);
+  if(ssd1306display != NULL) {
+    char *newLine = (char *) malloc((sizeof(char) * strlen(buf)) + 1);
+    strcpy(newLine, buf);
+    addLine(newLine);
+    draw();
   }
 }
 
 void TerminalLogger::log(char *output, bool newline) {
-  if(newline) {
-    u8g2log.println(output);
-    Serial.println(output);
-  }
-  else {
-    u8g2log.print(output);
-    Serial.print(output);
+  snprintf(buf, BUFFER_WIDTH, "%s%s", output, newline ? "\n" : "");  
+  Serial.print(buf);
+  if(ssd1306display != NULL) {
+    char *newLine = (char *) malloc((sizeof(char) * strlen(buf)) + 1);
+    strcpy(newLine, buf);
+    addLine(newLine);
+    draw();
   }
 }
 
 void TerminalLogger::log(char output, bool newline) {
-  if(newline) {
-    u8g2log.println(output);
-    Serial.println(output);
+  snprintf(buf, BUFFER_WIDTH, "%c%s", output, newline ? "\n" : "");  
+  Serial.print(buf);
+  if(ssd1306display != NULL) {
+    char *newLine = (char *) malloc((sizeof(char) * strlen(buf)) + 1);
+    strcpy(newLine, buf);
+    draw();
   }
-  else {
-    u8g2log.print(output);
-    Serial.print(output);
-  }  
 }
