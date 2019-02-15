@@ -31,9 +31,10 @@
 #ifndef SSD1306Wire_h
 #define SSD1306Wire_h
 
-#include "OLEDDisplay.h"
+#include <Arduino.h>
 #include <Wire.h>
 
+#include "OLEDDisplay.h"
 
 class SSD1306Wire : public OLEDDisplay {
   private:
@@ -86,10 +87,10 @@ class SSD1306Wire : public OLEDDisplay {
           for (x = 0; x < this->width(); x++) {
            uint16_t pos = x + y * this->width();
            if (buffer[pos] != buffer_back[pos]) {
-             minBoundY = _min(minBoundY, y);
-             maxBoundY = _max(maxBoundY, y);
-             minBoundX = _min(minBoundX, x);
-             maxBoundX = _max(maxBoundX, x);
+             minBoundY = minBoundY < y ? minBoundY : y;
+             maxBoundY = maxBoundY > y ? maxBoundY : y;
+             minBoundX = minBoundX < x ? minBoundX : x;
+             maxBoundX = maxBoundX > x ? maxBoundX : x;
            }
            buffer_back[pos] = buffer[pos];
          }

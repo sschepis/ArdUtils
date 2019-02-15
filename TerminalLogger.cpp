@@ -2,6 +2,7 @@
 
 #include "Vector.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 #define BUFFER_WIDTH 32
 #define BUFFER_HEIGHT 8

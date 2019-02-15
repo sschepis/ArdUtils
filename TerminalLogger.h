@@ -1,6 +1,7 @@
 #ifndef TERMINAL__LOGGER_H
 #define TERMINAL__LOGGER_H
 
+#include <Arduino.h>
 #include <string.h>
 #include <Wire.h>
 

@@ -462,13 +462,9 @@
 // LoRaClass LoRa;
 
 
-
-
-
-
-
-
 #include "LoRa.h"
+
+#include <SPI.h>
 
 // registers
 #define REG_FIFO                 0x00

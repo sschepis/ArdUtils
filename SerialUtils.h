@@ -1,5 +1,5 @@
-#ifndef ARD__UTILS_H
-#define ARD__UTILS_H
+#ifndef SERIAL__UTILS_H
+#define SERIAL__UTILS_H
 
 #define SP(message) Serial.print(message)
 #define SPL(message) Serial.println(message)

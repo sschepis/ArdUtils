@@ -31,7 +31,7 @@
 #ifndef OLEDDISPLAY_h
 #define OLEDDISPLAY_h
 
-#include <Esp.h>
+#include <Arduino.h>
 #include <stdint.h>
 
 #include "OLEDDisplayFonts.h"
