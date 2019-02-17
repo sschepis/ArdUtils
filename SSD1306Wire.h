@@ -28,8 +28,7 @@
  *
  */
 
-#ifndef SSD1306Wire_h
-#define SSD1306Wire_h
+#pragma once
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -64,7 +63,7 @@ class SSD1306Wire : public OLEDDisplay {
     	    delay(50);
     	    digitalWrite(_rst, HIGH);
         }
-		Wire.begin(this->_sda, this->_scl);
+		    Wire.begin(this->_sda, this->_scl);
         if(this->_freq != 0) Wire.setClock(this->_freq);
 
 		return true;
@@ -181,7 +180,3 @@ class SSD1306Wire : public OLEDDisplay {
     }
 
 };
-
-//SSD1306Wire display;
-
-#endif
